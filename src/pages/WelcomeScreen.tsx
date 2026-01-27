@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import welcomeIllustration from '@/assets/welcome-illustration.png';
 import herflowLogo from '@/assets/herflow-logo.png';
 
 export function WelcomeScreen() {
@@ -21,14 +20,6 @@ export function WelcomeScreen() {
           </p>
         </div>
 
-        {/* Illustration */}
-        <div className="relative w-64 h-64">
-          <img
-            src={welcomeIllustration}
-            alt="Woman with calendar illustration"
-            className="w-full h-full object-contain"
-          />
-        </div>
 
         {/* Welcome Text */}
         <div className="space-y-3">
