@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import welcomeIllustration from '@/assets/welcome-illustration.png';
+import herflowLogo from '@/assets/herflow-logo.png';
 
 export function WelcomeScreen() {
   const navigate = useNavigate();
@@ -9,10 +10,12 @@ export function WelcomeScreen() {
     <div className="min-h-screen herflow-gradient-bg flex flex-col items-center justify-center px-6 py-12 animate-fade-in">
       <div className="w-full max-w-sm flex flex-col items-center text-center space-y-8">
         {/* Logo/Title */}
-        <div className="space-y-2">
-          <h1 className="text-4xl font-bold text-foreground tracking-tight">
-            Her<span className="text-primary">Flow</span>
-          </h1>
+        <div className="space-y-2 flex flex-col items-center">
+          <img 
+            src={herflowLogo} 
+            alt="HerFlow Logo" 
+            className="w-32 h-32 object-contain"
+          />
           <p className="text-muted-foreground text-sm">
             Your personal cycle companion
           </p>
