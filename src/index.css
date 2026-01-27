@@ -2,95 +2,102 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
-
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* HerFlow Modern Theme - Soft Pastels */
+    --background: 340 30% 98%;
+    --foreground: 340 20% 25%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 340 20% 25%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 340 20% 25%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 340 60% 75%;
+    --primary-foreground: 340 20% 20%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 270 40% 90%;
+    --secondary-foreground: 270 30% 30%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 340 20% 94%;
+    --muted-foreground: 340 10% 50%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 200 60% 88%;
+    --accent-foreground: 200 40% 30%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 70% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 340 20% 90%;
+    --input: 340 20% 92%;
+    --ring: 340 60% 75%;
 
-    --radius: 0.5rem;
+    --radius: 1rem;
 
-    --sidebar-background: 0 0% 98%;
+    /* HerFlow Custom Colors */
+    --herflow-rose: 340 60% 75%;
+    --herflow-rose-light: 340 50% 92%;
+    --herflow-lavender: 270 40% 85%;
+    --herflow-lavender-light: 270 35% 95%;
+    --herflow-blue: 200 60% 85%;
+    --herflow-blue-light: 200 50% 95%;
+    --herflow-peach: 20 70% 90%;
+    --herflow-mint: 160 40% 88%;
+    --herflow-cream: 40 40% 96%;
 
-    --sidebar-foreground: 240 5.3% 26.1%;
+    /* Gradients */
+    --gradient-rose: linear-gradient(135deg, hsl(340 60% 85%), hsl(340 50% 78%));
+    --gradient-lavender: linear-gradient(135deg, hsl(270 40% 92%), hsl(270 35% 85%));
+    --gradient-blue: linear-gradient(135deg, hsl(200 60% 92%), hsl(200 50% 85%));
+    --gradient-hero: linear-gradient(180deg, hsl(340 50% 96%), hsl(270 30% 95%));
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(340 30% 98%));
 
-    --sidebar-primary: 240 5.9% 10%;
+    /* Shadows */
+    --shadow-soft: 0 4px 20px -4px hsl(340 30% 70% / 0.15);
+    --shadow-card: 0 2px 12px -2px hsl(340 30% 70% / 0.1);
+    --shadow-button: 0 4px 14px -3px hsl(340 60% 65% / 0.3);
 
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Navigation */
+    --nav-background: 0 0% 100%;
+    --nav-active: 340 60% 75%;
   }
 
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+  /* Retro Pixel Theme */
+  .theme-retro {
+    --background: 45 30% 95%;
+    --foreground: 340 25% 20%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 45 25% 98%;
+    --card-foreground: 340 25% 20%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --primary: 340 55% 68%;
+    --primary-foreground: 45 20% 98%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 270 35% 82%;
+    --secondary-foreground: 270 40% 25%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --muted: 45 20% 90%;
+    --muted-foreground: 340 15% 45%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 200 50% 80%;
+    --accent-foreground: 200 45% 25%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --border: 45 20% 85%;
+    --input: 45 20% 88%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --herflow-rose: 340 55% 68%;
+    --herflow-rose-light: 340 45% 88%;
+    --herflow-lavender: 270 35% 78%;
+    --herflow-cream: 45 35% 92%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --gradient-hero: linear-gradient(180deg, hsl(45 30% 95%), hsl(45 25% 90%));
+    --gradient-card: linear-gradient(145deg, hsl(45 25% 98%), hsl(45 20% 94%));
+  }
+
+  .theme-retro * {
+    font-family: 'VT323', 'Courier New', monospace !important;
+    letter-spacing: 0.02em;
   }
 }
 
@@ -99,7 +106,149 @@ All colors MUST be HSL.
     @apply border-border;
   }
 
+  html {
+    font-size: 13px;
+    -webkit-text-size-adjust: 100%;
+    touch-action: manipulation;
+  }
+
+  @media (min-width: 640px) {
+    html {
+      font-size: 16px;
+    }
+  }
+
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Hidden scrollbars with smooth scrolling */
+  * {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  *::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Disable zoom on mobile */
+  input, select, textarea, button {
+    font-size: 16px !important;
+  }
+
+  @media (max-width: 640px) {
+    input, select, textarea, button {
+      font-size: 16px !important;
+    }
+  }
+}
+
+@layer components {
+  .herflow-gradient-bg {
+    background: var(--gradient-hero);
+  }
+
+  .herflow-card {
+    background: var(--gradient-card);
+    box-shadow: var(--shadow-card);
+    @apply rounded-3xl;
+  }
+
+  .herflow-button-primary {
+    background: var(--gradient-rose);
+    box-shadow: var(--shadow-button);
+    @apply text-primary-foreground rounded-2xl font-medium transition-all duration-200;
+  }
+
+  .herflow-button-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px -4px hsl(340 60% 65% / 0.4);
+  }
+
+  .herflow-button-primary:active {
+    transform: translateY(0);
+  }
+
+  .calendar-day {
+    @apply w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-200;
+  }
+
+  .calendar-day-period {
+    @apply bg-primary text-primary-foreground;
+  }
+
+  .calendar-day-fertile {
+    background: hsl(var(--herflow-lavender));
+    @apply text-secondary-foreground;
+  }
+
+  .calendar-day-ovulation {
+    background: hsl(var(--herflow-blue));
+    @apply text-accent-foreground ring-2 ring-offset-2 ring-accent;
+  }
+
+  .calendar-day-today {
+    @apply ring-2 ring-primary ring-offset-2;
+  }
+
+  .tracking-card {
+    @apply herflow-card p-4 space-y-3;
+  }
+
+  .nav-item {
+    @apply flex flex-col items-center gap-1 p-2 rounded-xl transition-all duration-200;
+  }
+
+  .nav-item-active {
+    @apply bg-primary/10 text-primary;
+  }
+}
+
+@layer utilities {
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 1rem);
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-out;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.4s ease-out;
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 0.2s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slideUp {
+    from { 
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to { 
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
   }
 }
