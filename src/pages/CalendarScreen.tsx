@@ -2,6 +2,8 @@ import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '@/contexts/AppContext';
 import { BottomNav } from '@/components/BottomNav';
+import { Header } from '@/components/Header';
+import { OnboardingReminder } from '@/components/OnboardingReminder';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import {
@@ -34,7 +36,6 @@ export function CalendarScreen() {
   } = useApp();
 
   const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
   const today = new Date();
   const nextPeriod = getNextPeriodDate();
@@ -57,7 +58,6 @@ export function CalendarScreen() {
 
     const lastPeriod = periods[0];
     const lastPeriodStart = parseISO(lastPeriod.startDate);
-    const daysAgo = differenceInDays(today, lastPeriodStart);
 
     if (nextPeriod) {
       const daysUntilNext = differenceInDays(nextPeriod, today);
@@ -92,19 +92,23 @@ export function CalendarScreen() {
   };
 
   const handleDateClick = (date: Date) => {
-    setSelectedDate(date);
     navigate('/tracking', { state: { selectedDate: format(date, 'yyyy-MM-dd') } });
   };
 
   return (
     <div className="min-h-screen herflow-gradient-bg pb-24">
-      {/* Header */}
-      <div className="px-6 pt-12 pb-6">
-        <h1 className="text-2xl font-bold text-foreground mb-1">
+      <Header />
+      
+      {/* Status Section */}
+      <div className="px-6 pt-6 pb-4">
+        <h2 className="text-2xl font-bold text-foreground mb-1">
           Hi, {userData?.name || 'there'}! 💕
-        </h1>
+        </h2>
         <p className="text-primary font-medium">{getStatusMessage()}</p>
       </div>
+
+      {/* Onboarding Reminder */}
+      <OnboardingReminder />
 
       {/* Status Cards */}
       <div className="px-6 mb-6">
@@ -183,7 +187,7 @@ export function CalendarScreen() {
                   key={i}
                   onClick={() => handleDateClick(day)}
                   className={cn(
-                    'calendar-day relative',
+                    'calendar-day relative aspect-square flex items-center justify-center mx-auto',
                     !isCurrentMonth && 'opacity-30',
                     isToday && 'calendar-day-today',
                     isPeriod && 'calendar-day-period',
@@ -191,9 +195,9 @@ export function CalendarScreen() {
                     !isPeriod && !isFertile && isOvulation && 'calendar-day-ovulation'
                   )}
                 >
-                  {format(day, 'd')}
+                  <span className="text-sm">{format(day, 'd')}</span>
                   {hasNotes && (
-                    <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary" />
+                    <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary" />
                   )}
                 </button>
               );
