@@ -1,6 +1,8 @@
 import { useState, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useApp, Theme } from '@/contexts/AppContext';
 import { BottomNav } from '@/components/BottomNav';
+import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
@@ -14,12 +16,14 @@ import {
   ChevronRight,
   Check,
   Sparkles,
+  AlertCircle,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
 export function SettingsScreen() {
-  const { userData, updateUserData, theme, setTheme, backupData, restoreData } = useApp();
+  const location = useLocation();
+  const { userData, updateUserData, setUserData, theme, setTheme, backupData, restoreData, periods, setOnboardingComplete } = useApp();
 
   const [showBackupConfirm, setShowBackupConfirm] = useState(false);
   const [showRestoreConfirm, setShowRestoreConfirm] = useState(false);
@@ -28,6 +32,10 @@ export function SettingsScreen() {
 
   const [editingField, setEditingField] = useState<string | null>(null);
   const [tempValue, setTempValue] = useState('');
+
+  // Check if onboarding is incomplete
+  const isOnboardingIncomplete = !userData?.name || !periods.length;
+  const showOnboardingSection = location.state?.showOnboardingSection || isOnboardingIncomplete;
 
   const startEditing = (field: string, value: string | number | undefined) => {
     setEditingField(field);
@@ -40,7 +48,16 @@ export function SettingsScreen() {
     switch (editingField) {
       case 'name':
         if (tempValue.trim()) {
-          updateUserData({ name: tempValue.trim() });
+          if (!userData) {
+            setUserData({
+              name: tempValue.trim(),
+              cycleLength: 28,
+              periodLength: 5,
+              pregnancyMode: false,
+            });
+          } else {
+            updateUserData({ name: tempValue.trim() });
+          }
         }
         break;
       case 'yearOfBirth':
@@ -116,13 +133,28 @@ export function SettingsScreen() {
 
   return (
     <div className="min-h-screen herflow-gradient-bg pb-24">
-      {/* Header */}
-      <div className="px-6 pt-12 pb-6">
-        <h1 className="text-2xl font-bold text-foreground mb-1">Settings</h1>
-        <p className="text-muted-foreground text-sm">Customize your experience</p>
-      </div>
+      <Header title="Settings" />
 
-      <div className="px-6 space-y-4">
+      <div className="px-6 pt-4 space-y-4">
+        {/* Complete Setup Banner */}
+        {showOnboardingSection && (
+          <div className="bg-primary/10 border border-primary/20 rounded-2xl p-4">
+            <div className="flex items-start gap-3">
+              <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                <AlertCircle className="w-4 h-4 text-primary" />
+              </div>
+              <div>
+                <h3 className="font-medium text-foreground text-sm mb-1">
+                  Complete your profile
+                </h3>
+                <p className="text-xs text-muted-foreground">
+                  Fill in your details below for accurate cycle predictions.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Profile Settings */}
         <div className="herflow-card p-4">
           <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
@@ -151,7 +183,9 @@ export function SettingsScreen() {
                   onClick={() => startEditing('name', userData?.name)}
                   className="flex items-center gap-1 text-foreground"
                 >
-                  <span className="text-sm">{userData?.name || 'Not set'}</span>
+                  <span className={cn('text-sm', !userData?.name && 'text-primary font-medium')}>
+                    {userData?.name || 'Set your name'}
+                  </span>
                   <ChevronRight className="w-4 h-4 text-muted-foreground" />
                 </button>
               )}

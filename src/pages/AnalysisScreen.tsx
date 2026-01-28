@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { BottomNav } from '@/components/BottomNav';
-import { BarChart3, TrendingUp, Calendar, Droplets, Activity } from 'lucide-react';
+import { Header } from '@/components/Header';
+import { BarChart3, TrendingUp, Calendar, Activity } from 'lucide-react';
 import { differenceInDays, parseISO } from 'date-fns';
 
 export function AnalysisScreen() {
@@ -67,15 +68,9 @@ export function AnalysisScreen() {
 
   return (
     <div className="min-h-screen herflow-gradient-bg pb-24">
-      {/* Header */}
-      <div className="px-6 pt-12 pb-6">
-        <h1 className="text-2xl font-bold text-foreground mb-1">Health Insights</h1>
-        <p className="text-muted-foreground text-sm">
-          Personalized analysis based on your data
-        </p>
-      </div>
+      <Header title="Health Insights" />
 
-      <div className="px-6 space-y-4">
+      <div className="px-6 pt-4 space-y-4">
         {insights ? (
           <>
             {/* Cycle Overview */}

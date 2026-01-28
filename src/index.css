@@ -174,7 +174,7 @@
   }
 
   .calendar-day {
-    @apply w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-200;
+    @apply w-9 h-9 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-200;
   }
 
   .calendar-day-period {
@@ -206,6 +206,19 @@
   .nav-item-active {
     @apply bg-primary/10 text-primary;
   }
+
+  /* Solid notification toasts */
+  [data-sonner-toast] {
+    @apply bg-card border border-border shadow-lg !important;
+  }
+
+  [data-sonner-toast][data-type="success"] {
+    @apply bg-card border-primary/20 !important;
+  }
+
+  [data-sonner-toast][data-type="error"] {
+    @apply bg-card border-destructive/20 !important;
+  }
 }
 
 @layer utilities {
@@ -223,6 +236,39 @@
 
   .animate-scale-in {
     animation: scaleIn 0.2s ease-out;
+  }
+
+  /* Custom colors for Tailwind */
+  .bg-herflow-rose-light {
+    background-color: hsl(var(--herflow-rose-light));
+  }
+
+  .bg-herflow-lavender-light {
+    background-color: hsl(var(--herflow-lavender-light));
+  }
+
+  .bg-herflow-blue-light {
+    background-color: hsl(var(--herflow-blue-light));
+  }
+
+  .bg-herflow-lavender {
+    background-color: hsl(var(--herflow-lavender));
+  }
+
+  .bg-herflow-blue {
+    background-color: hsl(var(--herflow-blue));
+  }
+
+  .bg-herflow-peach {
+    background-color: hsl(var(--herflow-peach));
+  }
+
+  .bg-herflow-mint {
+    background-color: hsl(var(--herflow-mint));
+  }
+
+  .bg-herflow-cream {
+    background-color: hsl(var(--herflow-cream));
   }
 
   @keyframes fadeIn {

@@ -2,19 +2,17 @@ import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useApp, DailyLog } from '@/contexts/AppContext';
 import { BottomNav } from '@/components/BottomNav';
+import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
-import { format, parseISO, addDays } from 'date-fns';
+import { format, parseISO, addDays, isBefore, startOfMonth } from 'date-fns';
 import {
   Droplets,
   Frown,
   Smile,
   Meh,
   Heart,
-  Pill,
-  Thermometer,
-  Scale,
   GlassWater,
   ChevronLeft,
   ChevronRight,
@@ -25,8 +23,11 @@ import {
   Moon,
   Brain,
   X,
+  Trash2,
+  CalendarDays,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 const symptoms = [
   { id: 'cramps', label: 'Cramps', icon: Zap },
@@ -63,6 +64,7 @@ export function TrackingScreen() {
     addPeriod,
     periods,
     deletePeriod,
+    dailyLogs,
   } = useApp();
 
   const initialDate = location.state?.selectedDate || format(new Date(), 'yyyy-MM-dd');
@@ -79,6 +81,11 @@ export function TrackingScreen() {
   const [isPeriodStart, setIsPeriodStart] = useState(false);
   const [flowIntensity, setFlowIntensity] = useState(2);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showDeleteNoteConfirm, setShowDeleteNoteConfirm] = useState(false);
+  const [periodEndDate, setPeriodEndDate] = useState<string | null>(null);
+
+  // Check if selected date is in a past month
+  const isPastMonth = isBefore(parseISO(selectedDate), startOfMonth(new Date()));
 
   useEffect(() => {
     const existingLog = getDailyLog(selectedDate);
@@ -98,7 +105,11 @@ export function TrackingScreen() {
       });
       setIsPeriodStart(false);
     }
-  }, [selectedDate, getDailyLog]);
+
+    // Set period end date if logging period
+    const periodLength = userData?.periodLength || 5;
+    setPeriodEndDate(format(addDays(parseISO(selectedDate), periodLength - 1), 'yyyy-MM-dd'));
+  }, [selectedDate, getDailyLog, userData]);
 
   const toggleSymptom = (symptomId: string) => {
     setLog((prev) => ({
@@ -130,8 +141,7 @@ export function TrackingScreen() {
     
     if (isPeriodStart) {
       logToSave.flowIntensity = flowIntensity;
-      const periodLength = userData?.periodLength || 5;
-      const endDate = format(addDays(parseISO(selectedDate), periodLength - 1), 'yyyy-MM-dd');
+      const endDate = periodEndDate || format(addDays(parseISO(selectedDate), (userData?.periodLength || 5) - 1), 'yyyy-MM-dd');
       addPeriod({
         startDate: selectedDate,
         endDate,
@@ -140,6 +150,7 @@ export function TrackingScreen() {
     }
 
     addOrUpdateDailyLog(logToSave);
+    toast.success('Entry saved');
     navigate('/calendar');
   };
 
@@ -150,6 +161,14 @@ export function TrackingScreen() {
     }
     setIsPeriodStart(false);
     setShowDeleteConfirm(false);
+    toast.success('Period entry deleted');
+  };
+
+  const handleDeleteNote = () => {
+    setLog((prev) => ({ ...prev, notes: '' }));
+    addOrUpdateDailyLog({ ...log, notes: '', date: selectedDate });
+    setShowDeleteNoteConfirm(false);
+    toast.success('Note removed');
   };
 
   const navigateDate = (delta: number) => {
@@ -157,17 +176,28 @@ export function TrackingScreen() {
     setSelectedDate(newDate);
   };
 
+  const hasExistingNote = log.notes && log.notes.trim().length > 0;
+
   return (
     <div className="min-h-screen herflow-gradient-bg pb-24">
-      {/* Header */}
-      <div className="px-6 pt-12 pb-4">
-        <div className="flex items-center justify-between mb-4">
+      <Header 
+        title="Daily Log" 
+        showBackButton 
+        backPath="/calendar" 
+      />
+
+      {/* Date Navigation */}
+      <div className="px-6 py-4">
+        <div className="flex items-center justify-between herflow-card p-3">
           <button onClick={() => navigateDate(-1)} className="p-2 rounded-full hover:bg-muted">
             <ChevronLeft className="w-5 h-5" />
           </button>
-          <h1 className="text-lg font-semibold">
-            {format(parseISO(selectedDate), 'EEEE, MMMM d')}
-          </h1>
+          <div className="flex items-center gap-2">
+            <CalendarDays className="w-4 h-4 text-primary" />
+            <span className="font-semibold text-foreground">
+              {format(parseISO(selectedDate), 'EEEE, MMMM d')}
+            </span>
+          </div>
           <button onClick={() => navigateDate(1)} className="p-2 rounded-full hover:bg-muted">
             <ChevronRight className="w-5 h-5" />
           </button>
@@ -227,11 +257,27 @@ export function TrackingScreen() {
                   </button>
                 ))}
               </div>
+
+              {/* Period end date for past months */}
+              {isPastMonth && periodEndDate && (
+                <div className="bg-muted rounded-xl p-3 space-y-2">
+                  <p className="text-sm font-medium text-foreground">Period range</p>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">Start:</span>
+                    <span className="font-medium">{format(parseISO(selectedDate), 'MMM d, yyyy')}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">End:</span>
+                    <span className="font-medium">{format(parseISO(periodEndDate), 'MMM d, yyyy')}</span>
+                  </div>
+                </div>
+              )}
+
               {periods.some((p) => p.startDate === selectedDate) && (
                 <Button
                   variant="ghost"
                   onClick={() => setShowDeleteConfirm(true)}
-                  className="w-full text-destructive hover:text-destructive"
+                  className="w-full text-destructive hover:text-destructive hover:bg-destructive/10"
                 >
                   <X className="w-4 h-4 mr-2" />
                   Delete period entry
@@ -304,14 +350,14 @@ export function TrackingScreen() {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => handleWaterIntake(-1)}
-                className="w-8 h-8 rounded-full bg-muted flex items-center justify-center"
+                className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-foreground font-medium"
               >
                 -
               </button>
-              <span className="w-8 text-center font-medium">{log.waterIntake || 0}</span>
+              <span className="w-8 text-center font-medium text-foreground">{log.waterIntake || 0}</span>
               <button
                 onClick={() => handleWaterIntake(1)}
-                className="w-8 h-8 rounded-full bg-accent flex items-center justify-center"
+                className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-medium"
               >
                 +
               </button>
@@ -321,7 +367,17 @@ export function TrackingScreen() {
 
         {/* Notes */}
         <div className="herflow-card p-4">
-          <h3 className="font-medium text-foreground mb-3">Notes</h3>
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-medium text-foreground">Notes</h3>
+            {hasExistingNote && (
+              <button
+                onClick={() => setShowDeleteNoteConfirm(true)}
+                className="p-2 text-destructive hover:bg-destructive/10 rounded-lg transition-colors"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            )}
+          </div>
           <Textarea
             value={log.notes || ''}
             onChange={(e) => setLog((prev) => ({ ...prev, notes: e.target.value }))}
@@ -344,6 +400,16 @@ export function TrackingScreen() {
         description="Are you sure you want to delete this period entry? This action cannot be undone."
         confirmText="Delete"
         onConfirm={handleDeletePeriod}
+        variant="destructive"
+      />
+
+      <ConfirmDialog
+        open={showDeleteNoteConfirm}
+        onOpenChange={setShowDeleteNoteConfirm}
+        title="Remove Note"
+        description="Are you sure you want to remove this note? This action cannot be undone."
+        confirmText="Remove"
+        onConfirm={handleDeleteNote}
         variant="destructive"
       />
 

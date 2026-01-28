@@ -1,5 +1,6 @@
 import { useApp } from '@/contexts/AppContext';
 import { BottomNav } from '@/components/BottomNav';
+import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Baby, Heart, Sparkles, Calendar } from 'lucide-react';
@@ -18,15 +19,9 @@ export function PregnancyScreen() {
 
   return (
     <div className="min-h-screen herflow-gradient-bg pb-24">
-      {/* Header */}
-      <div className="px-6 pt-12 pb-6">
-        <h1 className="text-2xl font-bold text-foreground mb-1">Pregnancy Mode</h1>
-        <p className="text-muted-foreground text-sm">
-          Track your fertility for conception planning
-        </p>
-      </div>
+      <Header title="Pregnancy Mode" />
 
-      <div className="px-6 space-y-4">
+      <div className="px-6 pt-4 space-y-4">
         {/* Toggle Card */}
         <div className="herflow-card p-5">
           <div className="flex items-center justify-between">
