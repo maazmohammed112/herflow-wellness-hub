@@ -42,6 +42,8 @@ export function SettingsScreen() {
   const [tempValue, setTempValue] = useState('');
   const [tempDate, setTempDate] = useState<Date | undefined>();
   const [dobPopoverOpen, setDobPopoverOpen] = useState(false);
+  const [dobTextInput, setDobTextInput] = useState('');
+  const [showDobTextError, setShowDobTextError] = useState(false);
 
   // Check if onboarding is incomplete
   const isOnboardingIncomplete = !userData?.name || !periods.length;
@@ -98,8 +100,41 @@ export function SettingsScreen() {
     if (date) {
       updateUserData({ dateOfBirth: format(date, 'yyyy-MM-dd') });
       toast.success('Birthday saved');
+      setDobTextInput('');
+      setShowDobTextError(false);
     }
     setDobPopoverOpen(false);
+  };
+
+  const handleDobTextSave = () => {
+    // Try to parse various formats: DD/MM/YYYY, DD-MM-YYYY, YYYY-MM-DD
+    const trimmed = dobTextInput.trim();
+    let parsedDate: Date | null = null;
+    
+    // Try DD/MM/YYYY or DD-MM-YYYY
+    const ddmmyyyy = trimmed.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+    if (ddmmyyyy) {
+      const [, day, month, year] = ddmmyyyy;
+      parsedDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+    }
+    
+    // Try YYYY-MM-DD
+    const yyyymmdd = trimmed.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})$/);
+    if (yyyymmdd) {
+      const [, year, month, day] = yyyymmdd;
+      parsedDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+    }
+    
+    if (parsedDate && !isNaN(parsedDate.getTime()) && parsedDate <= new Date() && parsedDate >= new Date('1940-01-01')) {
+      updateUserData({ dateOfBirth: format(parsedDate, 'yyyy-MM-dd') });
+      toast.success('Birthday saved');
+      setDobTextInput('');
+      setShowDobTextError(false);
+      setEditingField(null);
+    } else {
+      setShowDobTextError(true);
+      toast.error('Invalid date. Use DD/MM/YYYY format.');
+    }
   };
 
   const handleBackup = () => {
@@ -210,33 +245,83 @@ export function SettingsScreen() {
             </div>
 
             {/* Date of Birth */}
-            <div className="flex items-center justify-between py-2">
-              <span className="text-sm text-muted-foreground">Date of Birth</span>
-              <Popover open={dobPopoverOpen} onOpenChange={setDobPopoverOpen}>
-                <PopoverTrigger asChild>
-                  <button className="flex items-center gap-1 text-foreground">
-                    <Cake className="w-4 h-4 mr-1 text-primary" />
-                    <span className={cn('text-sm', !userData?.dateOfBirth && 'text-primary font-medium')}>
-                      {userData?.dateOfBirth 
-                        ? format(parseISO(userData.dateOfBirth), 'MMM d, yyyy') 
-                        : 'Set birthday'}
-                    </span>
-                    <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="end">
-                  <Calendar
-                    mode="single"
-                    selected={userData?.dateOfBirth ? parseISO(userData.dateOfBirth) : undefined}
-                    onSelect={handleDobSave}
-                    disabled={(date) =>
-                      date > new Date() || date < new Date("1940-01-01")
+            <div className="py-2">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">Date of Birth</span>
+                {editingField === 'dob' ? (
+                  <div className="flex items-center gap-2">
+                    <Input
+                      value={dobTextInput}
+                      onChange={(e) => {
+                        setDobTextInput(e.target.value);
+                        setShowDobTextError(false);
+                      }}
+                      placeholder="DD/MM/YYYY"
+                      className={cn(
+                        "h-8 w-28 text-sm rounded-lg text-center",
+                        showDobTextError && "border-destructive"
+                      )}
+                      autoFocus
+                    />
+                    <button onClick={handleDobTextSave} className="p-1 text-primary">
+                      <Check className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <Popover open={dobPopoverOpen} onOpenChange={setDobPopoverOpen}>
+                      <PopoverTrigger asChild>
+                        <button className="flex items-center gap-1 text-foreground">
+                          <Cake className="w-4 h-4 mr-1 text-primary" />
+                          <span className={cn('text-sm', !userData?.dateOfBirth && 'text-primary font-medium')}>
+                            {userData?.dateOfBirth 
+                              ? format(parseISO(userData.dateOfBirth), 'MMM d, yyyy') 
+                              : 'Set birthday'}
+                          </span>
+                          <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent 
+                        className="w-auto p-0 z-[100]" 
+                        align="center"
+                        side="top"
+                        sideOffset={8}
+                      >
+                        <Calendar
+                          mode="single"
+                          selected={userData?.dateOfBirth ? parseISO(userData.dateOfBirth) : undefined}
+                          onSelect={handleDobSave}
+                          disabled={(date) =>
+                            date > new Date() || date < new Date("1940-01-01")
+                          }
+                          initialFocus
+                          className="p-3 pointer-events-auto"
+                          captionLayout="dropdown-buttons"
+                          fromYear={1940}
+                          toYear={new Date().getFullYear()}
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+                )}
+              </div>
+              {/* Text input hint */}
+              <div className="flex justify-end mt-1">
+                <button 
+                  onClick={() => {
+                    if (editingField === 'dob') {
+                      setEditingField(null);
+                      setDobTextInput('');
+                      setShowDobTextError(false);
+                    } else {
+                      setEditingField('dob');
                     }
-                    initialFocus
-                    className="p-3 pointer-events-auto"
-                  />
-                </PopoverContent>
-              </Popover>
+                  }}
+                  className="text-xs text-muted-foreground hover:text-primary transition-colors"
+                >
+                  {editingField === 'dob' ? 'Use calendar instead' : 'Or type: DD/MM/YYYY'}
+                </button>
+              </div>
             </div>
           </div>
         </div>
