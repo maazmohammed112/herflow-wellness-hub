@@ -6,9 +6,15 @@ import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
+import { Calendar } from '@/components/ui/calendar';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import {
   User,
-  Calendar,
+  Calendar as CalendarIcon,
   Droplets,
   Palette,
   Download,
@@ -17,9 +23,11 @@ import {
   Check,
   Sparkles,
   AlertCircle,
+  Cake,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { format, parseISO } from 'date-fns';
 
 export function SettingsScreen() {
   const location = useLocation();
@@ -32,6 +40,8 @@ export function SettingsScreen() {
 
   const [editingField, setEditingField] = useState<string | null>(null);
   const [tempValue, setTempValue] = useState('');
+  const [tempDate, setTempDate] = useState<Date | undefined>();
+  const [dobPopoverOpen, setDobPopoverOpen] = useState(false);
 
   // Check if onboarding is incomplete
   const isOnboardingIncomplete = !userData?.name || !periods.length;
@@ -82,6 +92,14 @@ export function SettingsScreen() {
 
     setEditingField(null);
     toast.success('Settings saved');
+  };
+
+  const handleDobSave = (date: Date | undefined) => {
+    if (date) {
+      updateUserData({ dateOfBirth: format(date, 'yyyy-MM-dd') });
+      toast.success('Birthday saved');
+    }
+    setDobPopoverOpen(false);
   };
 
   const handleBackup = () => {
@@ -191,31 +209,34 @@ export function SettingsScreen() {
               )}
             </div>
 
-            {/* Year of Birth */}
+            {/* Date of Birth */}
             <div className="flex items-center justify-between py-2">
-              <span className="text-sm text-muted-foreground">Year of Birth</span>
-              {editingField === 'yearOfBirth' ? (
-                <div className="flex items-center gap-2">
-                  <Input
-                    type="number"
-                    value={tempValue}
-                    onChange={(e) => setTempValue(e.target.value)}
-                    className="h-8 w-24 text-sm rounded-lg"
-                    autoFocus
-                  />
-                  <button onClick={saveEdit} className="p-1 text-primary">
-                    <Check className="w-4 h-4" />
+              <span className="text-sm text-muted-foreground">Date of Birth</span>
+              <Popover open={dobPopoverOpen} onOpenChange={setDobPopoverOpen}>
+                <PopoverTrigger asChild>
+                  <button className="flex items-center gap-1 text-foreground">
+                    <Cake className="w-4 h-4 mr-1 text-primary" />
+                    <span className={cn('text-sm', !userData?.dateOfBirth && 'text-primary font-medium')}>
+                      {userData?.dateOfBirth 
+                        ? format(parseISO(userData.dateOfBirth), 'MMM d, yyyy') 
+                        : 'Set birthday'}
+                    </span>
+                    <ChevronRight className="w-4 h-4 text-muted-foreground" />
                   </button>
-                </div>
-              ) : (
-                <button
-                  onClick={() => startEditing('yearOfBirth', userData?.yearOfBirth)}
-                  className="flex items-center gap-1 text-foreground"
-                >
-                  <span className="text-sm">{userData?.yearOfBirth || 'Not set'}</span>
-                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                </button>
-              )}
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="end">
+                  <Calendar
+                    mode="single"
+                    selected={userData?.dateOfBirth ? parseISO(userData.dateOfBirth) : undefined}
+                    onSelect={handleDobSave}
+                    disabled={(date) =>
+                      date > new Date() || date < new Date("1940-01-01")
+                    }
+                    initialFocus
+                    className="p-3 pointer-events-auto"
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
         </div>

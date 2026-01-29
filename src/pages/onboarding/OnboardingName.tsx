@@ -4,19 +4,27 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useApp } from '@/contexts/AppContext';
 import { Header } from '@/components/Header';
-import { User } from 'lucide-react';
+import { User, CalendarIcon } from 'lucide-react';
+import { format } from 'date-fns';
+import { Calendar } from '@/components/ui/calendar';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
 
 export function OnboardingName() {
   const navigate = useNavigate();
   const { setUserData } = useApp();
   const [name, setName] = useState('');
-  const [yearOfBirth, setYearOfBirth] = useState('');
+  const [dateOfBirth, setDateOfBirth] = useState<Date | undefined>();
 
   const handleContinue = () => {
     if (name.trim()) {
       setUserData({
         name: name.trim(),
-        yearOfBirth: yearOfBirth ? parseInt(yearOfBirth) : undefined,
+        dateOfBirth: dateOfBirth ? format(dateOfBirth, 'yyyy-MM-dd') : undefined,
         cycleLength: 28,
         periodLength: 5,
         pregnancyMode: false,
@@ -68,19 +76,36 @@ export function OnboardingName() {
 
           <div className="space-y-2">
             <label className="text-sm font-medium text-foreground">
-              Year of birth <span className="text-muted-foreground">(optional)</span>
+              Date of birth <span className="text-muted-foreground">(optional)</span>
             </label>
-            <Input
-              type="number"
-              value={yearOfBirth}
-              onChange={(e) => setYearOfBirth(e.target.value)}
-              placeholder="e.g., 1995"
-              className="h-12 rounded-2xl bg-card border-border text-base px-4"
-              min={1940}
-              max={new Date().getFullYear() - 10}
-            />
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full h-12 rounded-2xl justify-start text-left font-normal bg-card border-border",
+                    !dateOfBirth && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {dateOfBirth ? format(dateOfBirth, "PPP") : <span>Pick your birthday</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={dateOfBirth}
+                  onSelect={setDateOfBirth}
+                  disabled={(date) =>
+                    date > new Date() || date < new Date("1940-01-01")
+                  }
+                  initialFocus
+                  className="p-3 pointer-events-auto"
+                />
+              </PopoverContent>
+            </Popover>
             <p className="text-xs text-muted-foreground">
-              This helps us provide age-appropriate insights
+              We'll celebrate your birthday and provide age-appropriate insights
             </p>
           </div>
         </div>

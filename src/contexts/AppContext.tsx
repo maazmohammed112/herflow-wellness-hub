@@ -6,6 +6,7 @@ export type Theme = 'modern' | 'retro';
 export interface UserData {
   name: string;
   yearOfBirth?: number;
+  dateOfBirth?: string;
   cycleLength: number;
   periodLength: number;
   lastPeriodStart?: string;
