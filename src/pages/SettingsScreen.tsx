@@ -269,23 +269,25 @@ export function SettingsScreen() {
                   </div>
                 ) : (
                   <div className="flex items-center gap-2">
-                    <Popover open={dobPopoverOpen} onOpenChange={setDobPopoverOpen}>
+                    <Popover open={dobPopoverOpen} onOpenChange={setDobPopoverOpen} modal={true}>
                       <PopoverTrigger asChild>
                         <button className="flex items-center gap-1 text-foreground">
                           <Cake className="w-4 h-4 mr-1 text-primary" />
                           <span className={cn('text-sm', !userData?.dateOfBirth && 'text-primary font-medium')}>
-                            {userData?.dateOfBirth 
-                              ? format(parseISO(userData.dateOfBirth), 'MMM d, yyyy') 
+                            {userData?.dateOfBirth
+                              ? format(parseISO(userData.dateOfBirth), 'MMM d, yyyy')
                               : 'Set birthday'}
                           </span>
                           <ChevronRight className="w-4 h-4 text-muted-foreground" />
                         </button>
                       </PopoverTrigger>
-                      <PopoverContent 
-                        className="w-auto p-0 z-[100]" 
-                        align="center"
-                        side="top"
+                      <PopoverContent
+                        className="w-auto p-0"
+                        align="end"
+                        side="bottom"
                         sideOffset={8}
+                        avoidCollisions={true}
+                        collisionPadding={16}
                       >
                         <Calendar
                           mode="single"
@@ -295,7 +297,7 @@ export function SettingsScreen() {
                             date > new Date() || date < new Date("1940-01-01")
                           }
                           initialFocus
-                          className="p-3 pointer-events-auto"
+                          className="p-3"
                           captionLayout="dropdown-buttons"
                           fromYear={1940}
                           toYear={new Date().getFullYear()}
@@ -307,7 +309,7 @@ export function SettingsScreen() {
               </div>
               {/* Text input hint */}
               <div className="flex justify-end mt-1">
-                <button 
+                <button
                   onClick={() => {
                     if (editingField === 'dob') {
                       setEditingField(null);
