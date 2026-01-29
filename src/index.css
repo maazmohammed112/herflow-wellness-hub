@@ -188,11 +188,16 @@
 
   .calendar-day-ovulation {
     background: hsl(var(--herflow-blue));
-    @apply text-accent-foreground ring-2 ring-offset-2 ring-accent;
+    @apply text-accent-foreground ring-2 ring-offset-1 ring-accent;
   }
 
   .calendar-day-today {
-    @apply ring-2 ring-primary ring-offset-2;
+    @apply ring-2 ring-primary ring-offset-1;
+  }
+
+  .calendar-day-birthday {
+    @apply ring-2 ring-offset-1 ring-amber-400;
+    background: linear-gradient(135deg, hsl(45 80% 90%), hsl(340 50% 92%));
   }
 
   .tracking-card {

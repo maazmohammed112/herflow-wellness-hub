@@ -1,12 +1,47 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { BottomNav } from '@/components/BottomNav';
 import { Header } from '@/components/Header';
-import { BarChart3, TrendingUp, Calendar, Activity } from 'lucide-react';
+import { BarChart3, TrendingUp, Calendar, Activity, BookOpen, ChevronDown, ChevronUp } from 'lucide-react';
 import { differenceInDays, parseISO } from 'date-fns';
+import { cn } from '@/lib/utils';
+
+const educationalTips = [
+  {
+    title: "Understanding Your Menstrual Cycle",
+    icon: "🩸",
+    content: "Your menstrual cycle begins on the first day of your period and ends the day before your next period starts. The average cycle is 28 days, but anything between 21-35 days is considered normal. Tracking helps you understand your unique pattern."
+  },
+  {
+    title: "The Fertile Window Explained",
+    icon: "🌸",
+    content: "Your fertile window is typically 6 days: the 5 days before ovulation and the day of ovulation itself. Sperm can survive up to 5 days in the reproductive tract, while an egg lives only 12-24 hours after release. This is when pregnancy is most likely."
+  },
+  {
+    title: "Ovulation: What You Need to Know",
+    icon: "✨",
+    content: "Ovulation usually occurs 14 days before your next period. Signs include mild pelvic pain, increased cervical mucus (clear and stretchy like egg whites), a slight rise in basal body temperature, and increased libido. Some women may also notice breast tenderness."
+  },
+  {
+    title: "PMS & Period Symptoms",
+    icon: "💫",
+    content: "Premenstrual syndrome (PMS) can start 1-2 weeks before your period. Common symptoms include bloating, mood swings, food cravings, fatigue, and breast tenderness. Regular exercise, reducing salt and caffeine, and getting enough sleep can help manage symptoms."
+  },
+  {
+    title: "When to See a Doctor",
+    icon: "🏥",
+    content: "Consult a healthcare provider if you experience: periods lasting more than 7 days, cycles shorter than 21 days or longer than 35 days, extremely heavy bleeding, severe pain that affects daily activities, or missing three or more periods in a row."
+  },
+  {
+    title: "Cycle & Overall Health",
+    icon: "💪",
+    content: "Your menstrual cycle can be an indicator of overall health. Stress, significant weight changes, excessive exercise, and certain medical conditions can affect your cycle. Tracking helps you notice patterns and communicate effectively with healthcare providers."
+  }
+];
 
 export function AnalysisScreen() {
   const { userData, periods, dailyLogs } = useApp();
+  const [expandedTip, setExpandedTip] = useState<number | null>(null);
 
   const insights = useMemo(() => {
     if (periods.length < 2) {
@@ -155,16 +190,6 @@ export function AnalysisScreen() {
                 </div>
               </div>
             )}
-
-            {/* Educational Tip */}
-            <div className="herflow-card p-5 bg-herflow-cream">
-              <h3 className="font-semibold text-foreground mb-2">💡 Did you know?</h3>
-              <p className="text-sm text-muted-foreground">
-                The average menstrual cycle is 28 days, but cycles between 21-35 days are
-                considered normal. Tracking your cycle helps you understand your body's
-                unique rhythm.
-              </p>
-            </div>
           </>
         ) : (
           <div className="herflow-card p-8 text-center">
@@ -179,6 +204,53 @@ export function AnalysisScreen() {
             </p>
           </div>
         )}
+
+        {/* Educational Content Section */}
+        <div className="herflow-card p-5">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-full bg-herflow-cream flex items-center justify-center">
+              <BookOpen className="w-5 h-5 text-primary" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-foreground">Learn About Your Cycle</h3>
+              <p className="text-sm text-muted-foreground">Educational tips & info</p>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            {educationalTips.map((tip, index) => (
+              <div
+                key={index}
+                className="bg-muted rounded-xl overflow-hidden"
+              >
+                <button
+                  onClick={() => setExpandedTip(expandedTip === index ? null : index)}
+                  className="w-full flex items-center justify-between p-4 text-left"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="text-lg">{tip.icon}</span>
+                    <span className="font-medium text-foreground text-sm">{tip.title}</span>
+                  </div>
+                  {expandedTip === index ? (
+                    <ChevronUp className="w-4 h-4 text-muted-foreground" />
+                  ) : (
+                    <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                  )}
+                </button>
+                <div
+                  className={cn(
+                    "overflow-hidden transition-all duration-300",
+                    expandedTip === index ? "max-h-96 pb-4" : "max-h-0"
+                  )}
+                >
+                  <p className="text-sm text-muted-foreground px-4 leading-relaxed">
+                    {tip.content}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
       <BottomNav />

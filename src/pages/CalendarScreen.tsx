@@ -19,8 +19,10 @@ import {
   endOfWeek,
   differenceInDays,
   parseISO,
+  getMonth,
+  getDate,
 } from 'date-fns';
-import { ChevronLeft, ChevronRight, Droplets, Heart, Sparkles } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Droplets, Heart, Sparkles, Cake } from 'lucide-react';
 
 export function CalendarScreen() {
   const navigate = useNavigate();
@@ -41,6 +43,20 @@ export function CalendarScreen() {
   const nextPeriod = getNextPeriodDate();
   const cycleDay = getCycleDay(today);
 
+  // Check if it's user's birthday month
+  const isBirthdayMonth = useMemo(() => {
+    if (!userData?.dateOfBirth) return false;
+    const dob = parseISO(userData.dateOfBirth);
+    return getMonth(dob) === getMonth(today);
+  }, [userData?.dateOfBirth]);
+
+  // Check if a date is user's birthday
+  const isBirthday = (date: Date) => {
+    if (!userData?.dateOfBirth) return false;
+    const dob = parseISO(userData.dateOfBirth);
+    return getMonth(date) === getMonth(dob) && getDate(date) === getDate(dob);
+  };
+
   // Generate calendar days
   const calendarDays = useMemo(() => {
     const monthStart = startOfMonth(currentMonth);
@@ -52,12 +68,14 @@ export function CalendarScreen() {
 
   // Get status message
   const getStatusMessage = () => {
+    // Birthday month greeting
+    if (isBirthdayMonth) {
+      return "🎂 Happy Birthday Month! HerFlow wishes you joy! 💕";
+    }
+
     if (!periods.length) {
       return "Add your period to get started";
     }
-
-    const lastPeriod = periods[0];
-    const lastPeriodStart = parseISO(lastPeriod.startDate);
 
     if (nextPeriod) {
       const daysUntilNext = differenceInDays(nextPeriod, today);
@@ -99,6 +117,21 @@ export function CalendarScreen() {
     <div className="min-h-screen herflow-gradient-bg pb-24">
       <Header />
       
+      {/* Birthday Month Banner */}
+      {isBirthdayMonth && (
+        <div className="px-6 pt-4">
+          <div className="bg-gradient-to-r from-herflow-rose-light to-herflow-lavender-light rounded-2xl p-4 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+              <Cake className="w-5 h-5 text-primary" />
+            </div>
+            <div>
+              <p className="font-semibold text-foreground text-sm">Happy Birthday Month! 🎉</p>
+              <p className="text-xs text-muted-foreground">Wishing you health, happiness & flow harmony!</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Status Section */}
       <div className="px-6 pt-6 pb-4">
         <h2 className="text-2xl font-bold text-foreground mb-1">
@@ -164,7 +197,7 @@ export function CalendarScreen() {
           </div>
 
           {/* Weekday Headers */}
-          <div className="grid grid-cols-7 gap-1 mb-2">
+          <div className="grid grid-cols-7 mb-2">
             {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, i) => (
               <div key={i} className="text-center text-xs font-medium text-muted-foreground py-2">
                 {day}
@@ -173,7 +206,7 @@ export function CalendarScreen() {
           </div>
 
           {/* Calendar Grid */}
-          <div className="grid grid-cols-7 gap-1">
+          <div className="grid grid-cols-7">
             {calendarDays.map((day, i) => {
               const isCurrentMonth = isSameMonth(day, currentMonth);
               const isToday = isSameDay(day, today);
@@ -181,23 +214,29 @@ export function CalendarScreen() {
               const isFertile = isFertileDay(day);
               const isOvulation = isOvulationDay(day);
               const hasNotes = hasNote(day);
+              const isBday = isBirthday(day);
+              const dayNumber = format(day, 'd');
 
               return (
                 <button
                   key={i}
                   onClick={() => handleDateClick(day)}
                   className={cn(
-                    'calendar-day relative aspect-square flex items-center justify-center mx-auto',
+                    'calendar-day relative aspect-square flex items-center justify-center',
                     !isCurrentMonth && 'opacity-30',
                     isToday && 'calendar-day-today',
                     isPeriod && 'calendar-day-period',
-                    !isPeriod && isFertile && 'calendar-day-fertile',
-                    !isPeriod && !isFertile && isOvulation && 'calendar-day-ovulation'
+                    !isPeriod && isOvulation && 'calendar-day-ovulation',
+                    !isPeriod && !isOvulation && isFertile && 'calendar-day-fertile',
+                    isBday && 'calendar-day-birthday'
                   )}
                 >
-                  <span className="text-sm">{format(day, 'd')}</span>
+                  <span className="text-sm leading-none">{dayNumber}</span>
                   {hasNotes && (
                     <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary" />
+                  )}
+                  {isBday && (
+                    <span className="absolute -top-0.5 -right-0.5 text-[8px]">🎂</span>
                   )}
                 </button>
               );
@@ -205,7 +244,7 @@ export function CalendarScreen() {
           </div>
 
           {/* Legend */}
-          <div className="flex items-center justify-center gap-4 mt-4 pt-4 border-t border-border">
+          <div className="flex items-center justify-center gap-4 mt-4 pt-4 border-t border-border flex-wrap">
             <div className="flex items-center gap-1.5">
               <span className="w-3 h-3 rounded-full bg-primary" />
               <span className="text-xs text-muted-foreground">Period</span>
